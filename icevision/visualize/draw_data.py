@@ -4,6 +4,7 @@
 
 __all__ = [
     "draw_sample",
+    "draw_sample_custom",
     "draw_record",
     "draw_pred",
     "draw_bbox",
@@ -14,6 +15,7 @@ __all__ = [
 from icevision.imports import *
 from icevision.data import *
 from icevision.core import *
+
 
 
 def draw_sample(
@@ -35,8 +37,10 @@ def draw_sample(
         sample.get("masks", []),
         sample.get("keypoints", []),
     ):
-        color = (np.random.random(3) * 0.6 + 0.4) * 255
-        color = tuple(color.astype(int).tolist())
+        color = class_map.get_color(label)
+        if color is None:
+            color = (np.random.random(3) * 0.6 + 0.4) * 255
+            color = tuple(color.astype(int).tolist())
 
         if display_mask and mask is not None:
             img = draw_mask(img=img, mask=mask, color=color)
@@ -75,6 +79,77 @@ def draw_label(
 
     if class_map is not None:
         caption = class_map.get_by_id(label)
+    else:
+        caption = str(label)
+
+    return _draw_label(img=img, caption=caption, x=int(x), y=int(y), color=color)
+
+def draw_sample_custom(
+    sample,
+    class_map: Optional[ClassMap] = None,
+    denormalize_fn: Optional[callable] = None,
+    display_label: bool = True,
+    display_bbox: bool = True,
+    display_mask: bool = True,
+    display_keypoints: bool = True,
+):
+    img = sample["img"].copy()
+    if denormalize_fn is not None:
+        img = denormalize_fn(img)
+
+    for label, bbox, mask, keypoints, rd_in_bdr in itertools.zip_longest(
+        sample.get("labels", []),
+        sample.get("bboxes", []),
+        sample.get("masks", []),
+        sample.get("keypoints", []),
+        sample.get("in_bdr", []),
+    ):
+        color = class_map.get_color(label)
+        if color is None:
+            color = (np.random.random(3) * 0.6 + 0.4) * 255
+            color = tuple(color.astype(int).tolist())
+
+        if display_mask and mask is not None:
+            img = draw_mask(img=img, mask=mask, color=color)
+        if display_bbox and bbox is not None:
+            img = draw_bbox(img=img, bbox=bbox, color=color)
+        if display_label and label is not None:
+            img = draw_label_custom(
+                img=img,
+                label=label,
+                bbox=bbox,
+                mask=mask,
+                class_map=class_map,
+                color=color,
+                rd_in_bdr=rd_in_bdr,
+            )
+        if display_keypoints and keypoints is not None:
+            img = draw_keypoints(img=img, kps=keypoints, color=color)
+
+    return img
+
+
+def draw_label_custom(
+    img: np.ndarray,
+    label: int,
+    color,
+    class_map: Optional[ClassMap] = None,
+    bbox=None,
+    mask=None,
+    rd_in_bdr=False
+):
+    # finds label position based on bbox or mask
+    if bbox is not None:
+        x, y, _, _ = bbox.xyxy
+    elif mask is not None:
+        y, x = np.unravel_index(mask.data.argmax(), mask.data.shape)
+    else:
+        x, y = 0, 0
+
+    if class_map is not None:
+        caption = class_map.get_id(label)
+        if rd_in_bdr:
+            caption  = caption + '-BDR'
     else:
         caption = str(label)
 

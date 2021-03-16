@@ -44,6 +44,9 @@ class ClassMap:
             else:
                 raise e
 
+    def get_color(self, id: int) -> tuple:
+        return None
+
     def add_name(self, name) -> int:
         self._id2class.append(name)
         id = len(self._class2id)
