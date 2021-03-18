@@ -37,10 +37,12 @@ def draw_sample(
         sample.get("masks", []),
         sample.get("keypoints", []),
     ):
-        color = class_map.get_color(label)
-        if color is None:
-            color = (np.random.random(3) * 0.6 + 0.4) * 255
-            color = tuple(color.astype(int).tolist())
+        color = (np.random.random(3) * 0.6 + 0.4) * 255
+        color = tuple(color.astype(int).tolist())
+
+        if label is not None:
+            color = class_map.get_color(label)
+       
 
         if display_mask and mask is not None:
             img = draw_mask(img=img, mask=mask, color=color)
@@ -104,10 +106,11 @@ def draw_sample_custom(
         sample.get("keypoints", []),
         sample.get("in_bdr", []),
     ):
-        color = class_map.get_color(label)
-        if color is None:
-            color = (np.random.random(3) * 0.6 + 0.4) * 255
-            color = tuple(color.astype(int).tolist())
+        color = (np.random.random(3) * 0.6 + 0.4) * 255
+        color = tuple(color.astype(int).tolist())
+        
+        if label is not None:
+            color = class_map.get_color(label)
 
         if display_mask and mask is not None:
             img = draw_mask(img=img, mask=mask, color=color)
@@ -147,7 +150,7 @@ def draw_label_custom(
         x, y = 0, 0
 
     if class_map is not None:
-        caption = class_map.get_id(label)
+        caption = class_map.get_by_id(label)
         if rd_in_bdr:
             caption  = caption + '-BDR'
     else:
