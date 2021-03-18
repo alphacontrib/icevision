@@ -40,7 +40,7 @@ def draw_sample(
         color = (np.random.random(3) * 0.6 + 0.4) * 255
         color = tuple(color.astype(int).tolist())
 
-        if label is not None:
+        if (label is not None) and (class_map.get_color(0) is not None):
             color = class_map.get_color(label)
        
 
@@ -108,8 +108,7 @@ def draw_sample_custom(
     ):
         color = (np.random.random(3) * 0.6 + 0.4) * 255
         color = tuple(color.astype(int).tolist())
-        
-        if label is not None:
+        if (label is not None) and (class_map.get_color(0) is not None):
             color = class_map.get_color(label)
 
         if display_mask and mask is not None:
