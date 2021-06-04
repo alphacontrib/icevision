@@ -49,6 +49,7 @@ def unfreeze(params):
 def freeze(params):
     for p in params:
         p.requires_grad = False
+    
 
 
 def transform_dl(dataset, build_batch, batch_tfms=None, **dataloader_kwargs):
