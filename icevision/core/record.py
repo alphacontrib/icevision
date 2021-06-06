@@ -59,6 +59,9 @@ class BaseRecord(ImageidRecordMixin, SizeRecordMixin, RecordMixin, MutableMappin
         record._load()
         return record
 
+    def unload(self):
+        self.img = None
+
     def __repr__(self) -> str:
         _reprs = self._repr()
         _repr = "".join(f"\n\t- {o}" for o in _reprs)

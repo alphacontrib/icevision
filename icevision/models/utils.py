@@ -4,6 +4,7 @@ __all__ = [
     "freeze",
     "transform_dl",
     "common_build_batch",
+    "apply_batch_tfms",
     "_predict_dl",
 ]
 
@@ -53,7 +54,9 @@ def freeze(params):
 
 
 def transform_dl(dataset, build_batch, batch_tfms=None, **dataloader_kwargs):
-    collate_fn = partial(build_batch, batch_tfms=batch_tfms)
+    # collate_fn = partial(build_batch, batch_tfms=batch_tfms)
+    collate_fn = apply_batch_tfms(build_batch, batch_tfms=batch_tfms)
+    collate_fn = unload_records(collate_fn)
     return DataLoader(dataset=dataset, collate_fn=collate_fn, **dataloader_kwargs)
 
 
@@ -62,6 +65,28 @@ def common_build_batch(records: Sequence[RecordType], batch_tfms=None):
         records = batch_tfms(records)
 
     return records
+
+def apply_batch_tfms(build_batch, batch_tfms=None):
+    """This decorator function applies batch_tfms to records before passing them to build_batch"""
+
+    def inner(records):
+        if batch_tfms is not None:
+            records = batch_tfms(records)
+        return build_batch(records)
+
+    return inner
+
+def unload_records(build_batch):
+    """This decorator function unloads records to not carry them around after batch creation"""
+
+    def inner(records):
+        # print(build_batch(records))
+        batch, records = build_batch(records)
+        for record in records:
+            record['img'] = None
+        return batch, records
+
+    return inner
 
 
 @torch.no_grad()

@@ -171,9 +171,9 @@ def build_infer_batch(dataset: Sequence[RecordType], batch_tfms=None):
     outs = model(*batch)
     ```
     """
-    samples = common_build_batch(dataset, batch_tfms=batch_tfms)
+    # samples = common_build_batch(dataset, batch_tfms=batch_tfms)
 
-    tensor_imgs = [im2tensor(sample["img"]) for sample in samples]
+    tensor_imgs = [im2tensor(sample["img"]) for sample in dataset]
     tensor_imgs = torch.stack(tensor_imgs)
 
-    return (tensor_imgs,), samples
+    return (tensor_imgs,), dataset
