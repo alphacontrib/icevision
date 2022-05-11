@@ -60,8 +60,8 @@ from icevision.soft_dependencies import SoftDependencies
 if SoftDependencies.fastai:
     import fastai.vision.all as fastai
 
-if SoftDependencies.pytorch_lightning:
-    import pytorch_lightning as pl
+# if SoftDependencies.pytorch_lightning:
+#     import pytorch_lightning as pl
 
 if SoftDependencies.wandb:
     import wandb
