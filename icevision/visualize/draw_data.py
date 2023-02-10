@@ -94,6 +94,7 @@ def draw_sample_custom(
     display_bbox: bool = True,
     display_mask: bool = True,
     display_keypoints: bool = True,
+    bdr_string: str = '-BDR'
 ):
     img = sample["img"].copy()
     if denormalize_fn is not None:
@@ -124,6 +125,7 @@ def draw_sample_custom(
                 class_map=class_map,
                 color=color,
                 rd_in_bdr=rd_in_bdr,
+                bdr_string=bdr_string
             )
         if display_keypoints and keypoints is not None:
             img = draw_keypoints(img=img, kps=keypoints, color=color)
@@ -138,7 +140,8 @@ def draw_label_custom(
     class_map: Optional[ClassMap] = None,
     bbox=None,
     mask=None,
-    rd_in_bdr=False
+    rd_in_bdr=False,
+    bdr_string='-BDR'
 ):
     # finds label position based on bbox or mask
     if bbox is not None:
@@ -151,7 +154,7 @@ def draw_label_custom(
     if class_map is not None:
         caption = class_map.get_by_id(label)
         if rd_in_bdr:
-            caption  = caption + '-BDR'
+            caption  = caption + bdr_string
     else:
         caption = str(label)
 
